@@ -19,7 +19,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 import easyocr
 from paddleocr import PaddleOCR
-reader = easyocr.Reader(['en'])
+import torch
+if torch.cuda.is_available() or torch.backends.mps.is_available():
+    reader = easyocr.Reader(['en'], gpu=True)
+else:
+    reader = easyocr.Reader(['en'], gpu=False)
+
 paddle_ocr = PaddleOCR(
     lang='en',  # other lang also available
     use_angle_cls=False,
@@ -34,7 +39,6 @@ import base64
 
 import os
 import ast
-import torch
 from typing import Tuple, List
 from torchvision.ops import box_convert
 import re
