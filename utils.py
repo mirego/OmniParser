@@ -522,7 +522,7 @@ def check_ocr_box(image_path, display_img = True, output_bb_format='xywh', goal_
         conf = [item[1] for item in result]
         coord = [item[0] for item in result if item[1][1] > text_threshold]
         text = [item[1][0] for item in result if item[1][1] > text_threshold]
-       else:  # EasyOCR
+    else:  # EasyOCR
            if easyocr_args is None:
                easyocr_args = {}
            result = reader.readtext(image_path, **easyocr_args)
