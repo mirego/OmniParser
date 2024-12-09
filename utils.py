@@ -17,13 +17,19 @@ import cv2
 import numpy as np
 # %matplotlib inline
 from matplotlib import pyplot as plt
-#import easyocr
+import easyocr
 from paddleocr import PaddleOCR
 import torch
-#if torch.cuda.is_available() or torch.backends.mps.is_available():
-#    reader = easyocr.Reader(['en'], gpu=True)
-#else:
-#    reader = easyocr.Reader(['en'], gpu=False)
+if torch.cuda.is_available():
+    reader = easyocr.Reader(['en'], gpu=True)
+elif torch.backends.mps.is_available():
+    try:
+        x = torch.empty(1, device='mps')
+        reader = easyocr.Reader(['en'], gpu=True)
+    except RuntimeError:
+        reader = easyocr.Reader(['en'], gpu=False)
+else:
+    reader = easyocr.Reader(['en'], gpu=False)
 
 paddle_ocr = PaddleOCR(
     lang='en',  # other lang also available
@@ -516,13 +522,13 @@ def check_ocr_box(image_path, display_img = True, output_bb_format='xywh', goal_
         conf = [item[1] for item in result]
         coord = [item[0] for item in result if item[1][1] > text_threshold]
         text = [item[1][0] for item in result if item[1][1] > text_threshold]
-#    else:  # EasyOCR
-#        if easyocr_args is None:
-#            easyocr_args = {}
-#        result = reader.readtext(image_path, **easyocr_args)
-#        # print('goal filtering pred:', result[-5:])
-#        coord = [item[0] for item in result]
-#        text = [item[1] for item in result]
+       else:  # EasyOCR
+           if easyocr_args is None:
+               easyocr_args = {}
+           result = reader.readtext(image_path, **easyocr_args)
+           # print('goal filtering pred:', result[-5:])
+           coord = [item[0] for item in result]
+           text = [item[1] for item in result]
     # read the image using cv2
     if display_img:
         opencv_img = cv2.imread(image_path)
